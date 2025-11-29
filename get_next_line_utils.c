@@ -6,7 +6,7 @@
 /*   By: nograu <nograu@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/26 18:05:40 by nograu            #+#    #+#             */
-/*   Updated: 2025/11/29 13:25:10 by nograu           ###   ########.fr       */
+/*   Updated: 2025/11/29 14:10:02 by nograu           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ char	*ft_strjoin(char const *s1, char const *s2)
 	i = 0;
 	j = 0;
 	if (!s1)
-		return(result = ft_strdup(s2), result);
+		return (result = ft_strdup(s2), result);
 	result_size = ft_strlen(s1) + ft_strlen(s2);
 	result = malloc(sizeof(char) * (result_size + 1));
 	if (!result)
@@ -110,32 +110,3 @@ char	*ft_substr(char const *s, unsigned int start, size_t len)
 	sub[i] = '\0';
 	return (sub);
 }
-
-// static void	ft_bzero(void *s, size_t n)
-// {
-// 	unsigned char	*ptr;
-// 	size_t			i;
-
-// 	i = 0;
-// 	ptr = (unsigned char *)s;
-// 	while (i < n)
-// 	{
-// 		ptr[i] = '\0';
-// 		i++;
-// 	}
-// }
-
-// void	*ft_calloc(size_t nmemb, size_t size)
-// {
-// 	void	*ptr;
-// 	size_t	calcul;
-
-// 	if (nmemb != 0 && size != 0 && nmemb > SIZE_MAX / size)
-// 		return (NULL);
-// 	calcul = nmemb * size;
-// 	ptr = malloc(calcul);
-// 	if (!ptr)
-// 		return (NULL);
-// 	ft_bzero(ptr, calcul);
-// 	return (ptr);
-// }
