@@ -1,19 +1,20 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*   get_next_line.new.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: nograu <nograu@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/11/26 18:05:33 by nograu            #+#    #+#             */
-/*   Updated: 2025/11/27 16:26:58 by nograu           ###   ########.fr       */
+/*   Created: 2025/11/29 12:57:06 by nograu            #+#    #+#             */
+/*   Updated: 2025/11/29 13:34:24 by nograu           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
+
 #include <stdio.h>
 
-char	*check_stash(char *stash, char **line)
+static char	*check_stash(char *stash, char **line) // a mettre en static ou pas ?
 {
 	int				i;
 	unsigned int	new_stash_size;
@@ -41,33 +42,64 @@ char	*get_next_line(int fd)
 	char		*line;
 	char		*buffer;
 	static char	*stash;
-	size_t			bytes_read;
+	int			bytes_read;
 
 	line = NULL;
-	if (stash == NULL)
-	 	stash = malloc(sizeof(char) * (BUFFER_SIZE + 1));
-	if (!stash)
-		return (NULL);
-	buffer = malloc(sizeof(char) * (BUFFER_SIZE + 1)); // change n
+	buffer = malloc(sizeof(char) * (BUFFER_SIZE + 1));
 	if (!buffer)
-			return (NULL);
-	while (!line)
+		return (NULL);
+	bytes_read = read(fd, buffer, BUFFER_SIZE);
+	buffer[bytes_read] = '\0';
+	while (bytes_read > 0)
 	{
-		
-		bytes_read = read(fd, buffer, BUFFER_SIZE); // replace by nbytes ?
-		if (bytes_read <= 0)
-			return (stash);
-		buffer[bytes_read] = '\0';
 		stash = ft_strjoin(stash, buffer);
-		stash = check_stash(stash, &line);
+		
+		if (stash && ft_strchr(stash, '\n'))
+			break;
+		bytes_read = read(fd, buffer, BUFFER_SIZE);
+		buffer[bytes_read] = '\0';
 	}
-	return(line); //replace by line
+	free(buffer);
+	if (!stash || stash[0] == '\0' || bytes_read == -1)
+	{
+		free(stash);
+		stash = NULL;
+		return (NULL);
+	}
+	stash = check_stash(stash, &line);
+	if (!line && stash)
+	{
+		line = ft_strdup(stash);
+		free(stash);
+		stash = NULL;
+	}
+	return(line);
 }
 
 #include <stdio.h>
 #include <fcntl.h>
 
-int	main(void) // change n
+// int	main(void)
+// {
+// 	int	fd; // should work also when reading from the standard input -> write(1, "", 1); ??
+// 	int count;
+// 	char *next_line;
+
+// 	count = 0;
+// 	fd = open("example.txt", O_RDONLY);
+// 	next_line = get_next_line(fd);
+// 	while (next_line == get_next_line(fd))
+// 	{
+// 		count++;
+// 		printf("[%d]:%s", count, next_line);
+// 		free(next_line);
+// 	}
+// 	//printf("\n%s\n", next_line);
+// 	close(fd);
+// 	return (0);
+// }
+
+int	main(void)
 {
 	int	fd; // should work also when reading from the standard input -> write(1, "", 1); ??
 	int count;
@@ -75,12 +107,14 @@ int	main(void) // change n
 
 	count = 0;
 	fd = open("example.txt", O_RDONLY);
-	while (count <=16)
+	while (count <= 15)
 	{
 		next_line = get_next_line(fd);
 		count++;
 		printf("[%d]:%s", count, next_line);
+		free(next_line);
 	}
+	//printf("\n%s\n", next_line);
 	close(fd);
 	return (0);
 }

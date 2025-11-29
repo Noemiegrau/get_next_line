@@ -6,7 +6,7 @@
 /*   By: nograu <nograu@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/26 18:05:40 by nograu            #+#    #+#             */
-/*   Updated: 2025/11/27 15:53:04 by nograu           ###   ########.fr       */
+/*   Updated: 2025/11/29 13:25:10 by nograu           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,22 @@ size_t	ft_strlen(const char *s)
 	return (i);
 }
 
+char	*ft_strchr(const char *s, int c)
+{
+	int	i;
+
+	i = 0;
+	while (s[i])
+	{
+		if (s[i] == (char)c)
+			return ((char *)&s[i]);
+		i++;
+	}
+	if ((char)c == '\0')
+		return ((char *)&s[i]);
+	return (NULL);
+}
+
 char	*ft_strjoin(char const *s1, char const *s2)
 {
 	char			*result;
@@ -31,8 +47,8 @@ char	*ft_strjoin(char const *s1, char const *s2)
 
 	i = 0;
 	j = 0;
-	if (!s1 || !s2)
-		return (NULL);
+	if (!s1)
+		return(result = ft_strdup(s2), result);
 	result_size = ft_strlen(s1) + ft_strlen(s2);
 	result = malloc(sizeof(char) * (result_size + 1));
 	if (!result)
@@ -45,10 +61,11 @@ char	*ft_strjoin(char const *s1, char const *s2)
 	while (s2[j])
 		result[i++] = s2[j++];
 	result[i] = '\0';
+	free((void *)s1);
 	return (result);
 }
 
-static char	*ft_strdup(const char *s)
+char	*ft_strdup(const char *s)
 {
 	int		i;
 	int		len_s;
@@ -93,6 +110,20 @@ char	*ft_substr(char const *s, unsigned int start, size_t len)
 	sub[i] = '\0';
 	return (sub);
 }
+
+// static void	ft_bzero(void *s, size_t n)
+// {
+// 	unsigned char	*ptr;
+// 	size_t			i;
+
+// 	i = 0;
+// 	ptr = (unsigned char *)s;
+// 	while (i < n)
+// 	{
+// 		ptr[i] = '\0';
+// 		i++;
+// 	}
+// }
 
 // void	*ft_calloc(size_t nmemb, size_t size)
 // {
