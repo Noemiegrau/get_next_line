@@ -6,13 +6,40 @@
 /*   By: nograu <nograu@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/29 12:57:06 by nograu            #+#    #+#             */
-/*   Updated: 2025/11/29 14:25:27 by nograu           ###   ########.fr       */
+/*   Updated: 2025/11/30 18:58:45 by nograu           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-#include <stdio.h>
+static void	ft_bzero(void *s, size_t n)
+{
+	unsigned char	*ptr;
+	size_t			i;
+
+	i = 0;
+	ptr = (unsigned char *)s;
+	while (i < n)
+	{
+		ptr[i] = '\0';
+		i++;
+	}
+}
+
+static void	*ft_calloc(size_t nmemb, size_t size)
+{
+	void	*ptr;
+	size_t	calcul;
+
+	if (nmemb != 0 && size != 0 && nmemb > SIZE_MAX / size)
+		return (NULL);
+	calcul = nmemb * size;
+	ptr = malloc(calcul);
+	if (!ptr)
+		return (NULL);
+	ft_bzero(ptr, calcul);
+	return (ptr);
+}
 
 static char	*check_stash(char *stash, char **line)
 {
@@ -37,17 +64,6 @@ static char	*check_stash(char *stash, char **line)
 	return (stash);
 }
 
-int	read_and_stash(int fd, char **stash)
-{
-	char	*buffer;
-	int		bytes_read;
-
-	buffer = malloc(sizeof(char) * (BUFFER_SIZE + 1));
-	if (!buffer)
-		return (NULL); // -1 ?
-
-}
-
 char	*get_next_line(int fd)
 {
 	char		*line;
@@ -56,109 +72,51 @@ char	*get_next_line(int fd)
 	int			bytes_read;
 
 	line = NULL;
-	buffer = malloc(sizeof(char) * (BUFFER_SIZE + 1));
+	buffer = ft_calloc(sizeof(char), BUFFER_SIZE + 1);
 	if (!buffer)
 		return (NULL);
 	bytes_read = read(fd, buffer, BUFFER_SIZE);
-	buffer[bytes_read] = '\0';
 	while (bytes_read > 0)
 	{
 		stash = ft_strjoin(stash, buffer);
 		if (stash && ft_strchr(stash, '\n'))
 			break ;
 		bytes_read = read(fd, buffer, BUFFER_SIZE);
-		buffer[bytes_read] = '\0';
 	}
 	free(buffer);
 	if (!stash || stash[0] == '\0' || bytes_read == -1)
-	{
-		free(stash);
-		stash = NULL;
-		return (NULL);
-	}
+		return (free(stash), stash = NULL, NULL);
 	stash = check_stash(stash, &line);
 	if (!line && stash)
-	{ 
-		line = ft_strdup(stash);
-		free(stash);
-		stash = NULL;
-	}
+		return (line = ft_strdup(stash), free(stash), stash = NULL, line);
 	return (line);
 }
-
-
-// char	*get_next_line(int fd)
-// {
-// 	char		*line;
-// 	char		*buffer;
-// 	static char	*stash;
-// 	int			bytes_read;
-
-// 	line = NULL;
-// 	buffer = malloc(sizeof(char) * (BUFFER_SIZE + 1));
-// 	if (!buffer)
-// 		return (NULL);
-// 	bytes_read = read(fd, buffer, BUFFER_SIZE);
-// 	buffer[bytes_read] = '\0';
-// 	while (bytes_read > 0)
-// 	{
-// 		stash = ft_strjoin(stash, buffer);
-// 		if (stash && ft_strchr(stash, '\n'))
-// 			break ;
-// 		bytes_read = read(fd, buffer, BUFFER_SIZE);
-// 		buffer[bytes_read] = '\0';
-// 	}
-// 	free(buffer);
-// 	if (!stash || stash[0] == '\0' || bytes_read == -1)
-// 	{
-// 		free(stash);
-// 		stash = NULL;
-// 		return (NULL);
-// 	}
-// 	stash = check_stash(stash, &line);
-// 	if (!line && stash)
-// 	{ 
-// 		line = ft_strdup(stash);
-// 		free(stash);
-// 		stash = NULL;
-// 	}
-// 	return (line);
-// }
 
 #include <stdio.h>
 #include <fcntl.h>
 
 int	main(void)
 {
-	int	fd; // should work also when reading from the standard input??
-	int count;
-	char *next_line;
-
-	count = 0;
-	fd = open("example.txt", O_RDONLY);
-	while (count <= 15)
+	int	fd = open("example.txt", O_RDONLY);
+	char	*line;
+	while ((line = get_next_line(fd)))
 	{
-		next_line = get_next_line(fd);
-		count++;
-		printf("[%d]:%s", count, next_line);
-		free(next_line);
+		printf("%s", line);
+		free(line);
 	}
-	//printf("\n%s\n", next_line);
-	close(fd);
-	return (0);
 }
 
 // int	main(void)
 // {
-// 	int	fd;
+// 	int	fd; // should work also when reading from the standard input??
 // 	int count;
 // 	char *next_line;
 
 // 	count = 0;
 // 	fd = open("example.txt", O_RDONLY);
-// 	next_line = get_next_line(fd);
-// 	while (next_line == get_next_line(fd))
+// 	while (count <= 15)
 // 	{
+// 		next_line = get_next_line(fd);
 // 		count++;
 // 		printf("[%d]:%s", count, next_line);
 // 		free(next_line);
